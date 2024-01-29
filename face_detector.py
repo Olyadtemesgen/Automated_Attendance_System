@@ -16,10 +16,12 @@ def recognize_faces(ImagePath: str):
     for idx, face_location in enumerate(face_locations):
         top, right, bottom, left = face_location
 
-        top = max(0, top - 20)
-        left = max(0, left -20)
-        right = right + 20
-        bottom = bottom + 20 
+        top = max(0, top - 400)
+        left = max(0, left - 400)
+         
+        right = min(images.shape[1], right + 400)
+        bottom = min(images.shape[0], bottom + 400)
+
 
         # print("A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(top, left, bottom, right))
         face_image = images[top:bottom, left:right]
