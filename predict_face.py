@@ -7,21 +7,22 @@ from keras.models import load_model
 import pickle
 from sheet import mark_attendance, count_males_and_females
 import datetime
+from keras.models import load_model
 
 def load_result_map(result_map_file):
     with open(result_map_file, 'rb') as f:
         result_map = pickle.load(f)
     return result_map
 
-
-image_path = "/home/olitye/Code/AI/CNN/students.jpg"
-
 def predict(image_path):
     
     images = face_recognition.load_image_file(image_path)
 
-    face_locations = face_recognition.face_locations(images)
-    # recognize_faces(face_locations, images)
+    # make the image to have greatest resolution
+    from PIL import Image
+    img = Image.open(image_path)
+
+    face_locations = face_recognition.face_locations(images, model="hoc")
     
     print("I found {} face(s) in this photograph.".format(len(face_locations)))
     images_name = []
@@ -29,13 +30,17 @@ def predict(image_path):
     today = datetime.date.today()
     attendance_date = today.strftime("%d/%m/%Y")
 
+    attendance_date = attendance_date + " " + str(datetime.datetime.now().hour)
+
+    # add the current hour to attendance_date
+
     for idx, face_location in enumerate(face_locations):
         top, right, bottom, left = face_location
 
-        top = max(0, top )
-        left = max(0, left )
-        right = right 
-        bottom = bottom 
+        top = max(0, top - 100)
+        left = max(0, left - 100)
+        right = min(images.shape[1], right + 100)
+        bottom = min(images.shape[0], bottom + 100)
 
         # print("A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(top, left, bottom, right))
         face_image = images[top:bottom, left:right]
@@ -56,14 +61,16 @@ def predict(image_path):
 
     is_already_predicted = set()
 
-    for image_path in images_name:
-        test_image=image.load_img(image_path,target_size=(64, 64))
+    for image_paths in images_name:
+        test_image=image.load_img(image_paths,target_size=(64, 64))
         
         test_image=image.img_to_array(test_image)
+        test_image=test_image/255
 
         test_image=np.expand_dims(test_image,axis=0)
 
-        model = load_model('face_recognition_model.h5')
+        model = load_model('face_recognition_model.keras')
+
         predictions = model.predict(test_image)
 
         result=model.predict(test_image,verbose=0)
@@ -73,51 +80,26 @@ def predict(image_path):
         print('####'*10)
         print('Prediction is: ',result_map[np.argmax(result)])
         
-        # while the maximum is already predicted, then predict the second maximum
+        print("image name", image_paths)
+        # print the maximum probability
+        print("Maximum probability is: ", np.max(result))
         while np.argmax(result) in is_already_predicted:
             result[0][np.argmax(result)] = -1
         
         is_already_predicted.add(np.argmax(result))
 
-        predictions_arr.append(result_map[np.argmax(result)])
+        if np.max(result) > 0.5:
+            predictions_arr.append(result_map[np.argmax(result)])
 
-        name, section, gender, id = result_map[np.argmax(result)].split('-')
-        mark_attendance(name, id, section, attendance_date, gender)
-
-    # # go through all the Face-Images and then go through all the child folder of it and then take the first image and then predict it
-    # root_folder = "/home/olitye/Code/AI/CNN/Face-Images/Final Testing Images"
-
-    # # Iterate over the face images
-    # for folder_name in os.listdir(root_folder):
-    #     folder_path = os.path.join(root_folder, folder_name)
+            name, section, gender, id = result_map[np.argmax(result)].split('-')
+            mark_attendance(name, id, section, attendance_date, gender)
         
-    #     # Check if the item in the root folder is a directory (child folder)
-    #     if os.path.isdir(folder_path):
-    #         # Get the first image in the child folder
-    #         images = os.listdir(folder_path)
-    #         if len(images) > 0:
-    #             image_path = os.path.join(folder_path, images[0])
-                
-    #             test_image=image.load_img(image_path,target_size=(64, 64))
+    for image_paths in images_name:
+        if os.path.exists(image_paths):
+            os.remove(image_paths)
     
-    #             test_image=image.img_to_array(test_image)
-
-    #             test_image=np.expand_dims(test_image,axis=0)
-
-    #             model = load_model('face_recognition_model.h5')
-    #             predictions = model.predict(test_image)
-
-    #             result=model.predict(test_image,verbose=0)
-
-    #             result_map = load_result_map('ResultsMap.pkl')  
-
-    #             print('####'*10)
-    #             print("foooooooooooooooooldeeeeeeeeeeeeeerrrrrrr name", folder_name)
-    #             print('Prediction is: ',result_map[np.argmax(result)])
-
-    
-    # delete all the images saved
-    for image_path in images_name:
+    # delete the file in file_path
+    if os.path.exists(image_path):
         os.remove(image_path)
         
     male, female = count_males_and_females(attendance_date)

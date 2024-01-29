@@ -7,9 +7,12 @@ import os
 from werkzeug.utils import secure_filename
 from predict_face import predict
 from add_attendee import add_student
-from train import train_model as train
-
+from train_main import train_model as train
+from flask_cors import CORS
+import threading
 app = Flask(__name__)
+CORS(app)  # Allow all origins for testing purposes
+
 
 # Specify the folder where the uploaded zip file will be stored
 UPLOAD_FOLDER = '/home/olitye/Code/AI/CNN'
@@ -31,27 +34,48 @@ def upload_zip():
     if file.filename == '':
         return 'Invalid filename', 400
     
-    # Save the file to the upload folder
+    print("filllllllllllllllllleeeeeeeeeeeeee name", file.filename)
+    # # Save the file to the upload folder
+    # if file and allowed_file_zip(file.filename):
+    #     filename = secure_filename(file.filename)
+    #     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    #     file.save(file_path)
+
+    #     # Extract the contents of the zip file
+    #     print("file", file_path)
+    #     add_student(file_path)
+    #     train()
+    #     return '{} added to the class Successfully.'.format(filename).replace('.zip', '').split('-')[0]
+    
+    # return 'Invalid file', 400
+
     if file and allowed_file_zip(file.filename):
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
         # Extract the contents of the zip file
-        add_student(file_path)
-        train()
-        return '{} added to the class Successfully.'.format(filename).replace('.zip', '').split('-')[0]
+        print("file", file_path)
+
+        # Start a separate thread to add a student and train
+        processing_thread = threading.Thread(target=process_student, args=(file_path,))
+        processing_thread.start()
+
+        return '{} added to the class. Training started in the background.'.format(filename).replace('.zip', '').split('-')[0]
     
     return 'Invalid file', 400
+
+def process_student(file_path):
+    add_student(file_path)
+    train()
+
+    
 
 # Helper function to check if the file extension is allowed
 def allowed_file_zip(filename):
     allowed_extensions = {'zip'}
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in allowed_extensions
-
-
-
 
 # Helper function to check if the file extension is allowed
 def allowed_file_img(filename):
@@ -61,7 +85,7 @@ def allowed_file_img(filename):
 
 
 # Specify the folder where the uploaded images will be stored
-UPLOAD_FOLDER = '/home/olitye/Code/AI/CNN'
+UPLOAD_FOLDER = '/home/olitye/Code/AI/CNN/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/take-attendance', methods=['GET', 'POST'])
@@ -88,6 +112,9 @@ def upload_image():
             
             students, predictions, genders = predict(file_path)
 
+            print("students", students)
+            print("predictions", predictions)
+            print(genders)
             return {
                 'students': students,
                 'predictions': predictions, 
@@ -97,9 +124,6 @@ def upload_image():
         return 'Invalid file', 400
     
     return ""
-
-
-
 
 # @app.route('/take-attendance', methods=['POST'])
 # def take_attendance():

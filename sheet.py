@@ -3,7 +3,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment
 
 def mark_attendance(student_name, student_id, section, attendance_date, gender):
-    excel_file_path = '/home/olitye/Code/AI/CNN/attendance/SAMPLE.xlsx'  # Replace with the actual path to your Excel file
+    excel_file_path = '/home/olitye/Code/AI/CNN/attendance/Students_Attendance.xlsx'  # Replace with the actual path to your Excel file
 
     # Load the Excel file
     wb = openpyxl.load_workbook(excel_file_path)
@@ -44,7 +44,7 @@ def mark_attendance(student_name, student_id, section, attendance_date, gender):
         sheet.cell(row=unique_row_index, column=name_column_index + 3).value = gender
 
         # Set alignment for the new row
-        for col in sheet.iter_cols(min_col=name_column_index, max_col=name_column_index + 2):
+        for col in sheet.iter_cols(min_col=name_column_index, max_col=name_column_index + 3):
             for cell in col:
                 cell.alignment = Alignment(horizontal='center')
 
@@ -88,7 +88,7 @@ def mark_attendance(student_name, student_id, section, attendance_date, gender):
 
 # def count_genders(date):
 #     # a gender counter who come at that date 
-#     excel_file_path = '/home/olitye/Code/AI/CNN/attendance/SAMPLE.xlsx'  # Replace with the actual path to your Excel file
+#     excel_file_path = '/home/olitye/Code/AI/CNN/attendance/Students_Attendance.xlsx'  # Replace with the actual path to your Excel file
 
 #     # Load the Excel file
 #     wb = openpyxl.load_workbook(excel_file_path)
@@ -114,7 +114,7 @@ def mark_attendance(student_name, student_id, section, attendance_date, gender):
 
 def count_males_and_females(date):
 
-    filename = '/home/olitye/Code/AI/CNN/attendance/SAMPLE.xlsx'  # Replace with the actual path to your Excel file
+    filename = '/home/olitye/Code/AI/CNN/attendance/Students_Attendance.xlsx'  # Replace with the actual path to your Excel file
 
     wb = openpyxl.load_workbook(filename)
 
