@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:archive/archive.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -16,37 +17,147 @@ class Home extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.lightBlue[200],
           title: Center(child: Text('Attendance System')),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () {
-                // Add your logout logic here
-              },
-            ),
-          ],
         ),
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CameraPage()),
-                  );
-                },
-                child: Text('Take Attendance'),
+              // make a card with image and below a button
+              // ElevatedButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => CameraPage()),
+              //     );
+              //   },
+              //   child: Text('Take Attendance'),
+              // ),
+
+              SizedBox(
+                width: double.infinity,
+                height: 120,
+                child: Image.asset('./assets/images/download.png'),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                    // make it a card
+                    // width full
+
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 40),
+                      padding: EdgeInsets.all(40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CameraPage()),
+                      );
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(
+                            bottom: 10,
+                          ),
+                          decoration: BoxDecoration(
+                              border: Border.all(width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Image.asset(
+                            './assets/images/students.jpg',
+                            width: 200,
+                          ),
+                        ),
+                        Container(
+                          width: 300,
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue, width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          // make a child center
+                          child: Center(
+                            child: Text(
+                              'Take Attendance',
+                              style: TextStyle(
+                                // make a color blue beautiful and add a border
+                                fontSize: 18,
+
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    )),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddStudentPage()),
-                  );
-                },
-                child: Text('Add Student'),
+              // ElevatedButton(
+              //   onPressed: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => AddStudentPage()),
+              // );
+              //   },
+              //   child: Text('Add Student'),
+              // ),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                    // make it a card
+                    // width full
+
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.all(40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddStudentPage()),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(
+                            bottom: 10,
+                          ),
+                          decoration: BoxDecoration(
+                              border: Border.all(width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Image.asset(
+                            './assets/images/student.png',
+                            width: 200,
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+                          width: 300,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue, width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          // make a child center
+                          child: Center(
+                            child: Text(
+                              'Add Student',
+                              style: TextStyle(
+                                // make a color blue beautiful and add a border
+                                fontSize: 18,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    )),
               ),
             ],
           ),
@@ -61,7 +172,34 @@ class CameraPage extends StatefulWidget {
   _CameraPageState createState() => _CameraPageState();
 }
 
-class _CameraPageState extends State<CameraPage> {
+class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1500),
+  )..repeat();
+  late final Animation<double> _scaleAnimation =
+      Tween<double>(begin: 0.9, end: 1.05).animate(_controller);
+  late final Animation<double> _fadeAnimation =
+      Tween<double>(begin: 1, end: 0.6).animate(_controller);
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    // _animationController.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
   File? _image_selected;
   List<File> _images_selected = [];
   late bool _loading = false;
@@ -151,14 +289,65 @@ class _CameraPageState extends State<CameraPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: _take_picture,
-              child: Text('Take Picture'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _select_picture,
-              child: Text('Select Picture'),
+            Container(
+              height: 150,
+              margin: EdgeInsets.only(bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(width: 7),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _take_picture,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.only(
+                            top: 40, bottom: 40, left: 10, right: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          SvgPicture.asset(
+                            './assets/images/camera.svg',
+                            width: 50,
+                          ),
+                          Text(
+                            'Take Picture',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.only(
+                            top: 40, bottom: 40, left: 10, right: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      onPressed: _select_picture,
+                      child: Column(
+                        children: [
+                          SvgPicture.asset(
+                            './assets/images/upload.svg',
+                            width: 50,
+                          ),
+                          Text(
+                            'Select Picture',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 7),
+                ],
+              ),
             ),
 
             // If image is slected show it
@@ -166,34 +355,110 @@ class _CameraPageState extends State<CameraPage> {
 
             // If the attendance is taken add an Attendance Results Button
             _attendance_taken == true
-                ? ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AttendanceResultsPage(
-                                attendance_result: _attendance_result)),
-                      );
-                    },
-                    child: Text('Attendance Results'),
+                ?
+                // ? ElevatedButton(
+                //     onPressed: () {
+                //       Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //             builder: (context) => AttendanceResultsPage(
+                //                 attendance_result: _attendance_result)),
+                //       );
+                //     },
+                //     child: Text('Attendance Results'),
+                //   )
+                Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: ScaleTransition(
+                            scale: _scaleAnimation,
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.blue,
+                              ),
+                              margin:
+                                  EdgeInsets.only(left: 7, right: 7, top: 20),
+                              child: Container(
+                                child: Center(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      minimumSize: Size(double.infinity, 40),
+                                      backgroundColor: Colors.blue,
+                                      elevation: 0,
+                                      side: BorderSide(
+                                          width: 0, color: Colors.blue),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AttendanceResultsPage(
+                                                    attendance_result:
+                                                        _attendance_result)),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Attendance Results',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )),
+                      ),
+                    ],
                   )
                 : Text(''),
             _image_selected == null
-                ? Text('No image selected')
+                ? Text(
+                    'No image selected',
+                    style: TextStyle(fontSize: 20, color: Colors.red),
+                  )
                 :
                 // Make the image square and small
-                SizedBox(
-                    height: 200,
-                    width: 200,
-                    child: Image.file(_image_selected!),
+                Container(
+                    margin: EdgeInsets.only(top: 20),
+                    child: SizedBox(
+                      height: 200,
+                      width: 200,
+                      child: Image.file(_image_selected!),
+                    ),
                   ),
 
             _image_selected == null
                 ? Text('')
                 :
                 // Make the image square and small
-                ElevatedButton(
-                    onPressed: _send_image, child: Text('Send Image')),
+                Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.blue,
+                    ),
+                    margin: EdgeInsets.only(left: 7, right: 7, top: 20),
+                    child: Expanded(
+                      child: Center(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(double.infinity, 40),
+                            backgroundColor: Colors.blue,
+                            elevation: 0,
+                            side: BorderSide(width: 0, color: Colors.blue),
+                          ),
+                          onPressed: _send_image,
+                          child: Text(
+                            'Send Image',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
 
             SizedBox(height: 20),
             _loading == true ? CircularProgressIndicator() : Text(''),
@@ -315,10 +580,10 @@ class _AddStudentPageState extends State<AddStudentPage> {
 
         // Add logic to save student information to the backend if needed
         // Clear text controllers and image after saving
-        nameController.clear();
-        idController.clear();
-        sectionController.clear();
-        genderController.clear();
+        // nameController.clear();
+        // idController.clear();
+        // sectionController.clear();
+        // genderController.clear();
         setState(() {
           _image = null;
           _imageId++;
@@ -347,10 +612,10 @@ class _AddStudentPageState extends State<AddStudentPage> {
       }
       // Add logic to save student information to the backend if needed
       // Clear text controllers and image after saving
-      nameController.clear();
-      idController.clear();
-      sectionController.clear();
-      genderController.clear();
+      // nameController.clear();
+      // idController.clear();
+      // sectionController.clear();
+      // genderController.clear();
       setState(() {
         _image = null;
         _imageId++;
@@ -417,6 +682,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Student'),
+        backgroundColor: Colors.lightBlue[200],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -424,46 +690,193 @@ class _AddStudentPageState extends State<AddStudentPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Center(
+                child: Container(
+                  // make fully rounded
+                  width: 160,
+                  height: 160,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(160),
+                    color: Colors.white70,
+                  ),
+                  child: SvgPicture.asset(
+                    './assets/images/student-icon.svg',
+                    width: 200,
+                  ),
+                ),
+              ),
               TextField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(
+                  // labelText: 'Gender',
+                  label: RichText(
+                    text: TextSpan(
+                        text: 'Name',
+                        style: const TextStyle(color: Colors.grey),
+                        children: [
+                          TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ))
+                        ]),
+                  ),
+                ),
               ),
               TextField(
                 controller: idController,
-                decoration: InputDecoration(labelText: 'ID'),
+                decoration: InputDecoration(
+                  // labelText: 'Gender',
+                  label: RichText(
+                    text: TextSpan(
+                        text: 'ID',
+                        style: const TextStyle(color: Colors.grey),
+                        children: [
+                          TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ))
+                        ]),
+                  ),
+                ),
               ),
               TextField(
                 controller: sectionController,
-                decoration: InputDecoration(labelText: 'Section'),
+                decoration: InputDecoration(
+                  // labelText: 'Gender',
+                  label: RichText(
+                    text: TextSpan(
+                        text: 'Section',
+                        style: const TextStyle(color: Colors.grey),
+                        children: [
+                          TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ))
+                        ]),
+                  ),
+                ),
               ),
               TextField(
                 controller: genderController,
-                decoration: InputDecoration(labelText: 'Gender'),
+                decoration: InputDecoration(
+                  // labelText: 'Gender',
+                  label: RichText(
+                    text: TextSpan(
+                        text: 'Gender',
+                        style: const TextStyle(color: Colors.grey),
+                        children: [
+                          TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ))
+                        ]),
+                  ),
+                ),
               ),
               // Make a grid having take Images and Select Images horizontally
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                // Take Images and Select Images vertically
-
-                children: [
-                  ElevatedButton(
-                    onPressed: _takePictures,
-                    child: Text('Take Pictures'),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _selectPictures,
-                    child: Text('Select Pictures'),
-                  ),
-                  SizedBox(height: 20),
-                ],
+              SizedBox(height: 20),
+              Container(
+                height: 150,
+                margin: EdgeInsets.only(bottom: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // SizedBox(width: 7),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _takePictures,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.only(
+                              top: 40, bottom: 40, left: 10, right: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            SvgPicture.asset(
+                              './assets/images/camera.svg',
+                              width: 50,
+                            ),
+                            Text(
+                              'Take Picture',
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 15),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.only(
+                              top: 40, bottom: 40, left: 10, right: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        onPressed: _selectPictures,
+                        child: Column(
+                          children: [
+                            SvgPicture.asset(
+                              './assets/images/upload.svg',
+                              width: 50,
+                            ),
+                            Text(
+                              'Select Picture',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // SizedBox(width: 7),
+                  ],
+                ),
               ),
-              ElevatedButton(
-                // Disable it if the user has not taken or selected any images or all of the information is not provided
 
-                onPressed: _addStudent,
-                child: Text('Save Student'),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.blue,
+                ),
+                margin: EdgeInsets.only(left: 7, right: 7),
+                child: Expanded(
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 40),
+                        backgroundColor: Colors.blue,
+                        disabledBackgroundColor: Colors.blue,
+
+                        elevation: 0,
+                        // make its background the color of its parent
+
+                        side: BorderSide(width: 0, color: Colors.blue),
+                      ),
+                      // if _folder is empty disable the button else enable it
+                      onPressed: _folder == ''
+                          ? null
+                          : _is_on_training == true
+                              ? null
+                              : _addStudent,
+                      //
+
+                      child: Text(
+                        'Save Student',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(height: 40),
 
@@ -495,6 +908,7 @@ class AttendanceResultsPage extends StatefulWidget {
 }
 
 class _AttendanceResultsPageState extends State<AttendanceResultsPage> {
+  var _section_chosen = "";
   @override
   Widget build(BuildContext context) {
     // Create a function to show the modal
@@ -527,45 +941,96 @@ class _AttendanceResultsPageState extends State<AttendanceResultsPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0.0),
+            ),
             title: const Text('Selection by Gender'),
             // Create two lines having Male: {}  and Female: {}
 
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text("Male"),
-                    Text('${widget.attendance_result["genders"]["male"]}')
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text("Female"),
-                    Text('${widget.attendance_result["genders"]["female"]}')
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text("Total"),
-                    Text(
-                        '${widget.attendance_result["genders"]["male"] + widget.attendance_result["genders"]["female"]}')
-                  ],
-                )
-              ],
+            content: Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Male",
+                        style: TextStyle(color: Colors.blue, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        '${widget.attendance_result["genders"]["male"]}',
+                        style: TextStyle(color: Colors.blue, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      )
+                    ],
+                  ),
+                  Text(
+                    "______________________",
+                    style: TextStyle(color: Colors.blue, fontSize: 20),
+                    textAlign: TextAlign.left,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Female",
+                        style: TextStyle(color: Colors.blue, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        '${widget.attendance_result["genders"]["female"]}',
+                        style: TextStyle(color: Colors.blue, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      )
+                    ],
+                  ),
+                  // make a line
+                  Text(
+                    "______________________",
+                    style: TextStyle(color: Colors.blue, fontSize: 20),
+                    textAlign: TextAlign.left,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Total",
+                        style: TextStyle(color: Colors.blue, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        '${widget.attendance_result["genders"]["male"] + widget.attendance_result["genders"]["female"]}',
+                        style: TextStyle(color: Colors.blue, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "______________________",
+                    style: TextStyle(color: Colors.blue, fontSize: 20),
+                    textAlign: TextAlign.left,
+                  ),
+                ],
+              ),
             ),
             actions: <Widget>[
-              TextButton(
-                style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge,
+              Center(
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(fontSize: 20, color: Colors.red),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
-                child: const Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
               ),
             ],
           );
@@ -574,25 +1039,23 @@ class _AttendanceResultsPageState extends State<AttendanceResultsPage> {
     }
 
     // Create a function to show the modal
-    Future<void> _showSectionModalAttendance() async {
-      // Create a list view builder to show the attendance results
-      Expanded(
-        child: ListView.builder(
-          itemCount: widget.attendance_result.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text('${widget.attendance_result.keys.elementAt(index)}'),
-              subtitle:
-                  Text('${widget.attendance_result.values.elementAt(index)}'),
-            );
-          },
-        ),
-      );
+    Future<void> _showSectionDropdownAttendance() async {}
+
+    var students = widget.attendance_result["predictions"];
+
+    var section_set = Set<String>();
+
+    for (int i = 0; i < students.length; i++) {
+      section_set.add(students[i].split("-")[1]);
     }
 
+    var section_list = section_set.toList();
+
+    print("rebuilding");
     return Scaffold(
       appBar: AppBar(
         title: Text('Attendance Results'),
+        backgroundColor: Colors.lightBlue[200],
       ),
       body: Center(
         // change the background color to #bbb
@@ -600,21 +1063,183 @@ class _AttendanceResultsPageState extends State<AttendanceResultsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-                onPressed: () => _dialogBuilder(context),
-                child: Text('Select by Gender')),
+            Text(
+              "Filter Methods:",
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue),
+            ),
             SizedBox(height: 20),
-            ElevatedButton(
-              child: Text('Total Attendance'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => TotalAttendancePage(
-                          attendance_result: widget.attendance_result)),
-                );
-              },
-            )
+            Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: 50,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      minimumSize:
+                          Size(MediaQuery.of(context).size.width * 0.8, 40),
+                      // backgroundColor: Colors.blue,
+                      elevation: 0,
+                      side: BorderSide(width: 2, color: Colors.blue),
+                    ),
+                    onPressed: () => _dialogBuilder(context),
+                    child: Center(
+                      child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              // border: Border.all(color: Colors.blue, width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          // margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                          child: Text('Select by Gender',
+                              style: TextStyle(color: Colors.blue),
+                              textAlign: TextAlign.center)),
+                    )),
+              ),
+            ),
+            SizedBox(height: 20),
+            // Select by Section
+            Center(
+              child: Container(
+                padding: EdgeInsets.only(left: 30, right: 30),
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 2,
+                    color: Colors.blue,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  // color: Colors.blue,
+                ),
+                // child: ElevatedButton(
+                //     style: ElevatedButton.styleFrom(
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(10.0),
+                //       ),
+                //       minimumSize:
+                //           Size(MediaQuery.of(context).size.width * 0.8, 40),
+                //       // backgroundColor: Colors.blue,
+                //       elevation: 0,
+                //       side: BorderSide(width: 2, color: Colors.blue),
+                //     ),
+                //     onPressed: () => _showSectionModalAttendance(),
+                //     child: Center(
+                //       child: Container(
+                //           width: double.infinity,
+                //           decoration: BoxDecoration(
+                //               // border: Border.all(color: Colors.blue, width: 1),
+                //               borderRadius: BorderRadius.circular(10)),
+                //           // margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                //           child: Text('Select by Section',
+                //               style: TextStyle(color: Colors.blue),
+                //               textAlign: TextAlign.center)),
+                //     )),
+
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    hint: Text("Select By Section",
+                        style: TextStyle(color: Colors.blue),
+                        textAlign: TextAlign.center),
+                    // icon: const Icon(Icons.arrow_downward),
+                    iconSize: 28,
+
+                    elevation: 16,
+                    // style: const TextStyle(color: Colors.blue),
+                    style: TextStyle(color: Colors.blue),
+                    isExpanded: true,
+                    // underline: Container(
+                    //   height: 2,
+                    //   color: Colors.blue,
+                    // ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _section_chosen = newValue!;
+                      });
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => TotalAttendanceBySection(
+                                attendance_result: widget.attendance_result,
+                                section: _section_chosen)),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(10),
+
+                    iconEnabledColor: Colors.blue,
+
+                    items: section_list
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        onTap: () {
+                          setState(() {
+                            _section_chosen = value;
+                          });
+                          // route to a new page that shows the attendance and using the section
+                        },
+                        child: Center(
+                          child: Text(value,
+                              style: TextStyle(color: Colors.blue),
+                              textAlign: TextAlign.center),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+            // ElevatedButton(
+            //   child: Text('Total Attendance'),
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //           builder: (context) => TotalAttendancePage(
+            //               attendance_result: widget.attendance_result)),
+            //     );
+            //   },
+            // )
+
+            SizedBox(height: 20),
+            // Total Attendance
+            Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: 50,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      minimumSize:
+                          Size(MediaQuery.of(context).size.width * 0.8, 40),
+                      // backgroundColor: Colors.blue,
+                      elevation: 0,
+                      side: BorderSide(width: 2, color: Colors.blue),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TotalAttendancePage(
+                                attendance_result: widget.attendance_result)),
+                      );
+                    },
+                    child: Center(
+                      child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              // border: Border.all(color: Colors.blue, width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          // margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                          child: Text('Total Attendance',
+                              style: TextStyle(color: Colors.blue),
+                              textAlign: TextAlign.center)),
+                    )),
+              ),
+            ),
           ],
         ),
       ),
@@ -639,6 +1264,7 @@ class _TotalAttendancePageState extends State<TotalAttendancePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Total Attendance'),
+        backgroundColor: Colors.lightBlue[200],
       ),
 
       // create a table having 4 columns Name, Id, Section, Gender from the attendance_result["predictions"][index]["name"] etc
@@ -658,19 +1284,25 @@ class _TotalAttendancePageState extends State<TotalAttendancePage> {
             children: <TableRow>[
               TableRow(
                 children: <Widget>[
-                  Text("Name"),
-                  Text("Id"),
-                  Text("Section"),
-                  Text("Gender")
+                  Center(child: Text("Name")),
+                  Center(child: Text("Id")),
+                  Center(child: Text("Section")),
+                  Center(child: Text("Gender"))
                 ],
               ),
             ],
           ),
           // ListView.builder for Data Rows
+
           Expanded(
             child: ListView.builder(
               itemCount: widget.attendance_result["predictions"].length,
               itemBuilder: (context, index) {
+                var _color;
+
+                index % 2 == 0
+                    ? _color = Colors.grey
+                    : _color = Colors.grey[200];
                 return Table(
                   border: TableBorder.all(),
                   columnWidths: const <int, TableColumnWidth>{
@@ -682,8 +1314,8 @@ class _TotalAttendancePageState extends State<TotalAttendancePage> {
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   children: <TableRow>[
                     TableRow(
-                      decoration: const BoxDecoration(
-                        color: Colors.grey,
+                      decoration: BoxDecoration(
+                        color: _color,
                       ),
                       children: <Widget>[
                         Center(
@@ -701,6 +1333,111 @@ class _TotalAttendancePageState extends State<TotalAttendancePage> {
                         Center(
                           child: Text(
                               '${widget.attendance_result["predictions"][index].split("-")[2]}'),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// class TotalAttendanceBySection extends StatefulWidget
+
+class TotalAttendanceBySection extends StatefulWidget {
+  final Map<String, dynamic> attendance_result;
+  final String section;
+  const TotalAttendanceBySection(
+      {Key? key, required this.attendance_result, required this.section})
+      : super(key: key);
+
+  @override
+  _TotalAttendanceBySectionState createState() =>
+      _TotalAttendanceBySectionState();
+}
+
+class _TotalAttendanceBySectionState extends State<TotalAttendanceBySection> {
+  @override
+  Widget build(BuildContext context) {
+    var _selected_by_section = [];
+    for (var i = 0; i < widget.attendance_result["predictions"].length; i++) {
+      widget.attendance_result["predictions"][i].split("-")[1] == widget.section
+          ? _selected_by_section.add(widget.attendance_result["predictions"][i])
+          : null;
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Section ${widget.section} Attendance"),
+        backgroundColor: Colors.lightBlue[200],
+      ),
+      body: Column(
+        children: <Widget>[
+          // Header Row Widget
+          Table(
+            border: TableBorder.all(),
+            columnWidths: const <int, TableColumnWidth>{
+              0: FlexColumnWidth(),
+              1: FlexColumnWidth(),
+              2: FixedColumnWidth(64),
+              3: FixedColumnWidth(64),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: <TableRow>[
+              TableRow(
+                children: <Widget>[
+                  Center(child: Text("Name")),
+                  Center(child: Text("Id")),
+                  Center(child: Text("Section")),
+                  Center(child: Text("Gender"))
+                ],
+              ),
+            ],
+          ),
+          // ListView.builder for Data Rows
+          Expanded(
+            child: ListView.builder(
+              itemCount: _selected_by_section.length,
+              itemBuilder: (context, index) {
+                var _color;
+
+                index % 2 == 0
+                    ? _color = Colors.grey
+                    : _color = Colors.grey[200];
+                return Table(
+                  border: TableBorder.all(),
+                  columnWidths: const <int, TableColumnWidth>{
+                    0: FlexColumnWidth(),
+                    1: FlexColumnWidth(),
+                    2: FixedColumnWidth(64),
+                    3: FixedColumnWidth(64),
+                  },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: <TableRow>[
+                    TableRow(
+                      decoration: BoxDecoration(
+                        color: _color,
+                      ),
+                      children: <Widget>[
+                        Center(
+                          child: Text(
+                              '${_selected_by_section[index].split("-")[0]}'),
+                        ),
+                        Center(
+                          child: Text(
+                              '${_selected_by_section[index].split("-")[3]}'),
+                        ),
+                        Center(
+                          child: Text(
+                              '${_selected_by_section[index].split("-")[1]}'),
+                        ),
+                        Center(
+                          child: Text(
+                              '${_selected_by_section[index].split("-")[2]}'),
                         ),
                       ],
                     ),
