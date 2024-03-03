@@ -43,4 +43,4 @@ The Automated Attendance System streamlines attendance tracking using facial rec
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/automated-attendance-system.git
+   git clone https://github.com/OlyadTemesgen/automated-attendance-system.git
